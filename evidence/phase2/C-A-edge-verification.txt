@@ -1,0 +1,32 @@
+#### Extension C & A — edge-side verification (Tue Nov 24 14:28:19 IST 2026) ####
+
+[C] Backend B now lives on Dikshant's real laptop (10.7.24.165:3002),
+    firewalled (pf) to accept 3002 only from the edge 10.7.25.158.
+
+C-1 edge reaches Backend B directly (edge is whitelisted):
+{
+  "backend": "B",
+  "status": "ok",
+  "uptime_s": 748,
+  "time": "2026-11-24T08:58:20.022Z"
+}
+C-2 service works end-to-end through the edge, LB alternates A/B:
+B (10.7.24.165:3002) 
+A (127.0.0.1:3001) 
+B (10.7.24.165:3002) 
+A (127.0.0.1:3001) 
+B (10.7.24.165:3002) 
+A (127.0.0.1:3001) 
+
+C-3 pending: a NON-edge client (Vaibhav 10.7.3.140) must be REFUSED on :3002.
+
+[A] backup DNS resolver on Dikshant (10.7.24.165:53), same admv.test records:
+  dig @10.7.24.165 app.admv.test -> 10.7.25.158
+  dig @10.7.24.165 app.admv.test -> 10.7.25.158
+  dig @10.7.24.165 app.admv.test -> 10.7.25.158
+
+---- C-3 result (Tue Nov 24 14:36:08 IST 2026) ----
+From Vaibhav's laptop (non-edge client 10.7.3.140):
+  curl -m3 http://10.7.24.165:3002/api/status  ->  result=000 / exit=28 (timed out)
+=> A non-edge client is REFUSED on port 3002. Only the edge (10.7.25.158) reaches the
+   backend; the service still works end-to-end through the edge. Extension C CONFIRMED.
