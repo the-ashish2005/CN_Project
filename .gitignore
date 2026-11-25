@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------
+# PRIVATE KEYS MUST NEVER BE COMMITTED.
+# The CA private key would let anyone mint a certificate our clients trust.
+# Only the PUBLIC certificates (ca.crt, server.crt) belong in this repo.
+# ---------------------------------------------------------------------------
+*.key
+ca.key
+server.key
+*.csr
+*.srl
+
+# macOS
+.DS_Store
+._*
+
+# Python
+__pycache__/
+*.pyc
+
+# local scratch
+*.log
+/tmp/
