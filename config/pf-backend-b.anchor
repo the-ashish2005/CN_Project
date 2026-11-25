@@ -1,0 +1,18 @@
+# ---------------------------------------------------------------------------
+# Extension C — service isolation for BACKEND B
+# Lives on: Dikshant's laptop (Mac 4, 10.7.24.165), protecting port 3002
+# Install to: /etc/pf.anchors/admv
+#
+# Same shape as Backend A's anchor. See pf-backend-a.anchor for why the pass
+# rules precede the block and why "block drop" produces a timeout.
+#
+# This laptop also hosts the standby edge; when the standby is active it reaches
+# this backend over 127.0.0.1 (loopback), which never traverses en0 and so is
+# not affected by these rules.
+# ---------------------------------------------------------------------------
+
+# -- allow the PRIMARY edge (Mukul, Mac 2) --
+pass in quick on en0 proto tcp from 10.7.25.158 to any port 3002
+
+# -- refuse everyone else ---------------------------------------------------
+block drop in quick on en0 proto tcp to any port 3002

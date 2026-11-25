@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------------------
+# Extension C — service isolation for BACKEND A
+# Lives on: Ashish's laptop (Mac 3, 10.7.29.240), protecting port 3001
+# Install to: /etc/pf.anchors/admv
+#
+# Goal: the backend port is reachable ONLY from an edge. A client must not be
+# able to bypass TLS and load balancing by hitting the backend directly.
+#
+# pf evaluates top-to-bottom and "quick" means "first match wins", so the pass
+# rules MUST come before the block. Reverse them and nothing gets through.
+#
+# "block drop" silently discards the packet, so a blocked client sees a TIMEOUT
+# rather than "connection refused". That is the expected evidence: curl exits
+# 28. A refusal would mean the port is closed, which is a different thing.
+# ---------------------------------------------------------------------------
+
+# -- allow the PRIMARY edge (Mukul, Mac 2) --
+pass in quick on en0 proto tcp from 10.7.25.158 to any port 3001
+
+# -- allow the STANDBY edge (Dikshant, Mac 4) -------------------------------
+# NOTE: this line is REQUIRED and was missing from the original Phase 2 setup.
+# After an Extension E cutover the standby edge becomes the one serving traffic,
+# so if only the primary were whitelisted, every request would 502 the moment
+# the cutover happened — Extension C would silently break Extension E.
+pass in quick on en0 proto tcp from 10.7.24.165 to any port 3001
+
+# -- refuse everyone else ---------------------------------------------------
+block drop in quick on en0 proto tcp to any port 3001
