@@ -1,0 +1,24 @@
+#### FINAL SYSTEM VERIFICATION — Tue Nov 24 15:25:09 IST 2026 ####
+
+== DNS ==
+  [PASS] primary DNS (Vaibhav) app.admv.test -> edge
+  [PASS] primary DNS api.admv.test -> edge
+  [PASS] backup DNS (Dikshant) resolves (Ext A)
+== Edge / TLS ==
+  [PASS] HTTP :80 -> 301 redirect to HTTPS
+  [PASS] HTTP/2 negotiated
+  [PASS] TLS cert trusted (no -k)
+== Backends (real laptops) ==
+  [PASS] Backend A reachable (Ashish 10.7.29.240:3001)
+  [PASS] Backend B reachable (Dikshant 10.7.24.165:3002)
+== Load balancing (20 reqs) ==
+    A=10 B=10
+  [PASS] both real backends serve traffic
+== Caching (Ext F/Task F) ==
+  [PASS] conditional request -> 304
+== Standby edge (Ext E) ==
+  [PASS] standby edge serves (X-Edge: standby)
+== Full flow by name (system resolver) ==
+  [PASS] https://app.admv.test by name -> 200
+
+================  PASS=12  FAIL=0  ================
