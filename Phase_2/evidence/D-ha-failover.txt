@@ -1,29 +1,0 @@
-###############################################################
-# Extension D - HA Failover - evidence  (Tue Nov 24 00:04:11 IST 2026)
-###############################################################
-
-=== nginx upstream config (passive health check) ===
-upstream admv_backends {
-    server 127.0.0.1:3001 max_fails=1 fail_timeout=10s;   # Backend A container (= Mac 3)
-    server 127.0.0.1:3002 max_fails=1 fail_timeout=10s;   # Backend B container (= Mac 4)
-
-    # TOMORROW (real laptops): comment the two lines above and restore these,
-    # updating to Ashish's / Dikshant's actual LAN IPs:
-    # server 10.7.18.160:3001 max_fails=1 fail_timeout=10s;   # Mac 3 (Ashish)
-    # server 10.7.2.129:3002  max_fails=1 fail_timeout=10s;   # Mac 4 (Dikshant)
-}
-
-=== 1. BASELINE: both up, 8 requests alternate A/B ===
-served by:  B B A B A B A B 
-
-=== 2. STOP Backend A -> service continues via B ===
-HTTP codes: 200 200 200 200 200 200 200 200 
-served by:  B B B B B B B B 
-
-=== 3. RESTART Backend A -> LB resumes after fail_timeout (10s) ===
-   (waiting 12s for nginx to retry the recovered upstream...)
-served by:  B B A B A B A B 
-
-=== 4. BOTH down -> edge returns 502 (edge up, no upstream) ===
-HTTP codes: 502 502 502 
-(backends restarted)
